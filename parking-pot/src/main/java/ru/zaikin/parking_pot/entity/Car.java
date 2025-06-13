@@ -1,9 +1,7 @@
 package ru.zaikin.parking_pot.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import ru.zaikin.parking_pot.utility.CarType;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +14,19 @@ public class Car {
     private Long id;
     private String number;
     private LocalDateTime parkingTime;
+    @Enumerated(EnumType.STRING)
+    private CarType carType;
 
-    public Car(LocalDateTime parkingTime) {
+    public Car(Long id, String number, LocalDateTime parkingTime, CarType carType) {
+        this.id = id;
         this.number = number;
+        this.parkingTime = parkingTime;
+        this.carType = carType;
+    }
+
+    public Car(String number, CarType carType) {
+        this.number = number;
+        this.carType = carType;
     }
 
     public Car() {
@@ -41,6 +49,21 @@ public class Car {
         this.parkingTime = parkingTime;
     }
 
+    public CarType getCarType() {
+        return carType;
+    }
+
+    public void setCarType(CarType carType) {
+        this.carType = carType;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     @Override
     public String toString() {
