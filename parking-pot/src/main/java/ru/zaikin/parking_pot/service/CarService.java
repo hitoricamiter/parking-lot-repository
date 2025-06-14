@@ -1,29 +1,38 @@
 package ru.zaikin.parking_pot.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.zaikin.parking_pot.entity.Car;
-import ru.zaikin.parking_pot.repository.ParkingRepository;
-import ru.zaikin.parking_pot.utility.CarAlreadyParkedException;
+import ru.zaikin.parking_pot.entity.ParkingSession;
+import ru.zaikin.parking_pot.repository.CarRepository;
 
 import java.time.LocalDateTime;
 
 @Service
+@Transactional
 public class CarService {
-    private final ParkingRepository parkingRepository;
+    private final CarRepository carRepository;
 
-    public CarService(ParkingRepository parkingRepository) {
-        this.parkingRepository = parkingRepository;
+    public CarService(CarRepository parkingRepository) {
+        this.carRepository = parkingRepository;
     }
 
     public void save(Car car) {
 
-        if (parkingRepository.existsByNumber(car.getNumber())) {
-            throw new CarAlreadyParkedException("Машина с таким номером уже на парковке");
+
+
+        if (carRepository.existsByNumber(car.getNumber())) {
+            Car existingCar = carRepository.findByNumber(car.getNumber());
+            ParkingSession parkingSession = new ParkingSession();
+            parkingSession.setEntry(LocalDateTime.now());
+            existingCar.addParkingSession(parkingSession);
+            carRepository.save(existingCar);
+        } else {
+            ParkingSession parkingSession = new ParkingSession();
+            parkingSession.setEntry(LocalDateTime.now());
+            car.addParkingSession(parkingSession);
+            carRepository.save(car);
         }
-
-
-        car.setParkingTime(LocalDateTime.now());
-        parkingRepository.save(car);
     }
 
 }

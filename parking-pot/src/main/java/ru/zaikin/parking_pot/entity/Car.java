@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import ru.zaikin.parking_pot.utility.CarType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -12,15 +14,16 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String number;
-    private LocalDateTime parkingTime;
     @Enumerated(EnumType.STRING)
     private CarType carType;
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParkingSession> parkingSessionList = new ArrayList<>();
 
-    public Car(Long id, String number, LocalDateTime parkingTime, CarType carType) {
+    public Car(Long id, String number, CarType carType) {
         this.id = id;
         this.number = number;
-        this.parkingTime = parkingTime;
         this.carType = carType;
     }
 
@@ -33,21 +36,16 @@ public class Car {
 
     }
 
+    public void addParkingSession(ParkingSession parkingSession) {
+        parkingSession.setCar(this);
+        parkingSessionList.add(parkingSession);
+    }
+
     public String getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
-    }
 
-    public LocalDateTime getParkingTime() {
-        return parkingTime;
-    }
-
-    public void setParkingTime(LocalDateTime parkingTime) {
-        this.parkingTime = parkingTime;
-    }
 
     public CarType getCarType() {
         return carType;
@@ -65,12 +63,23 @@ public class Car {
         this.id = id;
     }
 
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public List<ParkingSession> getParkingSessionList() {
+        return parkingSessionList;
+    }
+
+    public void setParkingSessionList(List<ParkingSession> parkingSessionList) {
+        this.parkingSessionList = parkingSessionList;
+    }
+
     @Override
     public String toString() {
         return "Car{" +
                 "id=" + id +
                 ", number='" + number + '\'' +
-                ", parkingTime=" + parkingTime +
                 '}';
     }
 }
