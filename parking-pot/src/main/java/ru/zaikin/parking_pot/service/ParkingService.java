@@ -23,7 +23,29 @@ public class ParkingService {
         ParkingSession session = parkingRepository.findTopByCarAndExitIsNullOrderByEntryDesc(car).get();
         session.setExit(LocalDateTime.now());
         parkingRepository.save(session);
+    }
+
+    public String getReport(LocalDateTime from, LocalDateTime to) {
+        int free = 50 - parkingRepository.countByExitIsNotNull();
+        int booked = parkingRepository.countByExitIsNotNull();
+
+        double avg = parkingRepository.findAverageDurationInSecondsBetween(from, to);
+
+        long totalSeconds = (long) avg;
+
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        // Форматируем строку с ведущими нулями
+        String avgTime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+
+
+
+        return "Free " + free + " Booked " + booked + " AVG " + avgTime;
 
     }
+
+
 
 }
